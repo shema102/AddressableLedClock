@@ -4,12 +4,7 @@ import network
 from machine import RTC
 from machine import Timer
 import ntptime
-import writeToLeds
-
-
-rtc = RTC()
-
-ntptime.settime()
+import ledController
 
 
 def readSettings():
@@ -26,10 +21,6 @@ def readSettings():
     return (ssid, password, timezone)
 
 
-def setupClock():
-    pass
-
-
 def connectToWifi(ssid, password):
     """
     Function used to connect to WiFi.
@@ -41,22 +32,37 @@ def connectToWifi(ssid, password):
     wlan.connect(ssid, password)
     while not wlan.isconnected():
         pass
-    print("connected to {}".format(config["ssid"]))
+    print(f"connected to {ssid}")
 
 
 def convertTimezone(hour, timezone):
     """
-    Takes time in format: hours, timezone(e.g. "+10" , "-5").
+    Takes time in format: hours, timezone(e.g. "0", "+10" , "-5").
     and returns converted time.
     """
-    if timezone == "0":
-        return hour
+    if timezone[0] == "-":
+        timezone = int(timezone.replace("-", ""))
+        hour = hour - timezone
+    elif timezone[0] == "+":
+        timezone = int(timezone.replace("+", ""))
+        hour = hour + timezone
+
+    if hour >= 24:
+        hour -= 24
+    elif hour < 0:
+        hour += 24
+    return hour
 
 
-def updateTime():
+def updateTime(timezone):
     time = rtc.datetime()
-    writeToLeds.display_time(time[4] + 2, time[5])
+    hour = convertTimezone(time[4], timezone)
+    minute = time[5]
+    ledController.display_time(hour, minute)
 
+
+rtc = RTC()  # rtc hanlde
+ntptime.settime()  # updating time from net
 
 tim = Timer(-1)
 tim.init(

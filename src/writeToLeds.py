@@ -4,10 +4,10 @@ import neopixel
 led_pin = 14
 led_num = (
     2 * 7 * 4 + 2
-)  # 4 numbers of 7 segments 2 led per segment plus 2 led separartor
+)  # 4 numbers of 7 segments 2 led per segment and 2 led separartor
 np = neopixel.NeoPixel(machine.Pin(led_pin), led_num)
 
-# numbers, order of elements g e d c b a f:
+# sumbols, order of elements g e d c b a f (as in 7 segment display):
 num = (
     (0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 0
     (0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0),  # 1

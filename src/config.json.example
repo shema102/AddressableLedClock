@@ -1,4 +1,5 @@
 {
     "ssid": "WI-FI SSID",
     "password": "PASSWORD"
+    "timezone": "0"
 }

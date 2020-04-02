@@ -86,8 +86,10 @@ def displayTime(hour, minute, color, brightness=5):
     if len(hour) == 1:
         # if in houres we have only one digit add whitespace, so we don't get solething like "09:15" on clock
         hour = " " + hour
-    minute = str(minute).zfill(2)
-    time = (hour + minute)[::-1]
+    minute = str(minute)
+    if len(minute) == 1:
+        minute = "0" + minute
+    time = "".join(reversed(hour + minute))
     # reversed becauce we start filling numbers from least significant digit
     buffer = []
     for number in time:
@@ -96,7 +98,6 @@ def displayTime(hour, minute, color, brightness=5):
             buffer.append(bit)
     buffer.extend(symbol[":"])  # add separator
     bufferCollored = setColor(buffer, color, brightness)
-    print(bufferCollored)
-    for index, value in bufferCollored:
+    for index, value in enumerate(bufferCollored):
         np[index] = value
     np.write()

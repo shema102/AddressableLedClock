@@ -1,5 +1,6 @@
 {
     "ssid": "WI-FI SSID",
     "password": "PASSWORD"
-    "timezone": "0"
+    "timezone": "0",
+    "daylight_saving_time": true
 }

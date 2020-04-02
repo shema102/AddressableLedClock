@@ -18,7 +18,8 @@ def readSettings():
     ssid = config["ssid"]
     password = config["password"]
     zone = config["timezone"]
-    return (ssid, password, zone)
+    dst = config["daylight_saving_time"]
+    return (ssid, password, zone, dst)
 
 
 def connectToWifi(ssid, password):
@@ -32,10 +33,10 @@ def connectToWifi(ssid, password):
     wlan.connect(ssid, password)
     while not wlan.isconnected():
         pass
-    print(f"connected to {ssid}")
+    print("connected to ", ssid)
 
 
-def convertTimezone(hour, zone):
+def convertTimezone(hour, zone, DST):
     """
     Takes time in format: hours, timezone(e.g. "0", "+10" , "-5").
     and returns converted time.
@@ -46,6 +47,8 @@ def convertTimezone(hour, zone):
     elif zone[0] == "+":
         zone = int(zone.replace("+", ""))
         hour = hour + zone
+    if DST:
+        hour += 1
 
     if hour >= 24:
         hour -= 24
@@ -56,16 +59,16 @@ def convertTimezone(hour, zone):
 
 def updateTime(zone):
     time = rtc.datetime()
-    hour = convertTimezone(time[4], zone)
+    hour = convertTimezone(time[4], zone, dst)
     minute = time[5]
-    ledController.displayTime(hour, minute)
+    ledController.displayTime(hour, minute, "red")
 
 
-wifi_ssid, wifi_password, timezone = readSettings()  # read settings from json
+wifi_ssid, wifi_password, timezone, dst = readSettings()  # read settings from json
 connectToWifi(wifi_ssid, wifi_password)  # connect to wifi
 
 rtc = RTC()  # rtc handle
-ntptime.settime()  # updating time from net
+ntptime.settime()  # updating time from the net
 
 tim = Timer(-1)
 tim.init(

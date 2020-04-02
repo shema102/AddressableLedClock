@@ -17,8 +17,8 @@ def readSettings():
         config = json.load(f)
     ssid = config["ssid"]
     password = config["password"]
-    timezone = config["timezone"]
-    return (ssid, password, timezone)
+    zone = config["timezone"]
+    return (ssid, password, zone)
 
 
 def connectToWifi(ssid, password):
@@ -35,17 +35,17 @@ def connectToWifi(ssid, password):
     print(f"connected to {ssid}")
 
 
-def convertTimezone(hour, timezone):
+def convertTimezone(hour, zone):
     """
     Takes time in format: hours, timezone(e.g. "0", "+10" , "-5").
     and returns converted time.
     """
-    if timezone[0] == "-":
-        timezone = int(timezone.replace("-", ""))
-        hour = hour - timezone
-    elif timezone[0] == "+":
-        timezone = int(timezone.replace("+", ""))
-        hour = hour + timezone
+    if zone[0] == "-":
+        zone = int(zone.replace("-", ""))
+        hour = hour - zone
+    elif zone[0] == "+":
+        zone = int(zone.replace("+", ""))
+        hour = hour + zone
 
     if hour >= 24:
         hour -= 24
@@ -54,17 +54,20 @@ def convertTimezone(hour, timezone):
     return hour
 
 
-def updateTime(timezone):
+def updateTime(zone):
     time = rtc.datetime()
-    hour = convertTimezone(time[4], timezone)
+    hour = convertTimezone(time[4], zone)
     minute = time[5]
-    ledController.display_time(hour, minute)
+    ledController.displayTime(hour, minute)
 
 
-rtc = RTC()  # rtc hanlde
+wifi_ssid, wifi_password, timezone = readSettings()  # read settings from json
+connectToWifi(wifi_ssid, wifi_password)  # connect to wifi
+
+rtc = RTC()  # rtc handle
 ntptime.settime()  # updating time from net
 
 tim = Timer(-1)
 tim.init(
-    period=500, mode=Timer.PERIODIC, callback=lambda t: updateTime()
+    period=500, mode=Timer.PERIODIC, callback=lambda t: updateTime(timezone)
 )  # call updateTime() every 500 ms
